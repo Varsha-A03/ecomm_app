@@ -36,9 +36,10 @@ class _HomepageState extends State<Homepage> {
     try {
       final List<dynamic> fetchedProducts =
           await _apiService.fetchAllProducts();
-
+      print("Total products fetched: ${fetchedProducts.length}");
       setState(() {
         _allProducts.addAll(fetchedProducts);
+        
         _fetchPaginatedProducts(); // load the first page
       });
     } catch (error) {
@@ -65,13 +66,15 @@ class _HomepageState extends State<Homepage> {
 
     final int startIndex = (_page - 1) * _limit;
     final int endIndex = startIndex + _limit;
-
+    print(
+        "startIndex: $startIndex, endIndex: $endIndex, total: ${_allProducts.length}");
     // if starting index exceeds total products , stop loading
     if (startIndex >= _allProducts.length) {
       setState(() {
         _hasMoreProducts = false; //  No more products to load
         print("No more products to load");
       });
+      print("Current paginated products: ${_products.length}, total: ${_allProducts.length}");
       return;
     }
 
