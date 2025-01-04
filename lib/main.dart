@@ -1,12 +1,19 @@
 import 'package:ecomm_app/pages/homepage.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import './pages/login_page.dart';
 
 void main() async {
-  runApp(ECommApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('authToken');
+  final isLoggedIn = token != null && token.isNotEmpty;
+  runApp(ECommApp(isLoggedIn: isLoggedIn));
 }
 
 class ECommApp extends StatelessWidget {
-  const ECommApp({super.key});
+  final bool isLoggedIn;
+  const ECommApp({super.key, required this.isLoggedIn});
 
   // This widget is the root of your application.
   @override
@@ -30,7 +37,12 @@ class ECommApp extends StatelessWidget {
           backgroundColor: Color(0xFF91766E), // Brown bottom nav bar
         ),
       ),
-      home: Homepage(), // Set the homepage as the starting screen
+      home: isLoggedIn ? const Homepage() : const LoginPage(),
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => LoginPage(), // Default route is the login page
+        '/homepage': (context) => Homepage(), // Route for the homepage
+      },
     );
   }
 }
