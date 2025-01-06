@@ -1,14 +1,25 @@
+import 'package:ecomm_app/pages/cartpage.dart';
+import 'package:ecomm_app/pages/checkoutpage.dart';
 import 'package:ecomm_app/pages/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import './pages/login_page.dart';
+import 'package:provider/provider.dart';
+import './providers/cart_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('authToken');
   final isLoggedIn = token != null && token.isNotEmpty;
-  runApp(ECommApp(isLoggedIn: isLoggedIn));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
+      child: ECommApp(isLoggedIn: isLoggedIn),
+    ),
+  );
 }
 
 class ECommApp extends StatelessWidget {
@@ -42,6 +53,8 @@ class ECommApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginPage(), // Default route is the login page
         '/homepage': (context) => Homepage(), // Route for the homepage
+        '/cartpage': (context) => CartPage(),
+        '/checkout': (context) => CheckoutPage(),
       },
     );
   }

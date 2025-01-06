@@ -158,28 +158,22 @@ class _HomepageState extends State<Homepage> {
     setState(() {
       _selectedSortCriteria = criteria;
     });
-    if (criteria == null) {
-      setState(() {
-        _filteredProducts = List.from(_products);
-      });
-    } else {
-      List<dynamic> sortedProducts = [..._products];
-      if (criteria == "Price (Low to High)") {
-        sortedProducts.sort((a, b) => a['price'].compareTo(b['price']));
-      } else if (criteria == "Price (High to Low)") {
-        sortedProducts.sort((a, b) => b['price'].compareTo(a['price']));
-      } else if (criteria == "Popularity") {
-        sortedProducts.sort(
-            (a, b) => b['rating']['count'].compareTo(a['rating']['count']));
-      } else if (criteria == "Rating") {
-        sortedProducts
-            .sort((a, b) => b['rating']['rate'].compareTo(a['rating']['rate']));
-      }
-
-      setState(() {
-        _filteredProducts = sortedProducts;
-      });
+    List<dynamic> sortedProducts = [..._products];
+    if (criteria == "Price (Low to High)") {
+      sortedProducts.sort((a, b) => a['price'].compareTo(b['price']));
+    } else if (criteria == "Price (High to Low)") {
+      sortedProducts.sort((a, b) => b['price'].compareTo(a['price']));
+    } else if (criteria == "Popularity") {
+      sortedProducts
+          .sort((a, b) => b['rating']['count'].compareTo(a['rating']['count']));
+    } else if (criteria == "Rating") {
+      sortedProducts
+          .sort((a, b) => b['rating']['rate'].compareTo(a['rating']['rate']));
     }
+
+    setState(() {
+      _filteredProducts = sortedProducts;
+    });
     Navigator.pop(context); // close popup
   }
 
@@ -295,6 +289,12 @@ class _HomepageState extends State<Homepage> {
           backgroundColor: Colors.brown.shade600,
           iconTheme: IconThemeData(color: Colors.white),
           actions: [
+            IconButton(
+                onPressed: () {
+                  // navigate to cart page
+                  Navigator.pushNamed(context, '/cartpage');
+                },
+                icon: const Icon(Icons.shopping_cart)),
             PopupMenuButton<String>(
               position: PopupMenuPosition.over,
               offset: Offset(-50, 0),
@@ -371,6 +371,7 @@ class _HomepageState extends State<Homepage> {
                 ? Center(
                     child: Text(
                       'No products found. Wait Till the products load or try adjusting your filters.',
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.grey,
                         fontSize: 16.0,
