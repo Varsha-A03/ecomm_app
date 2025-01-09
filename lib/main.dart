@@ -1,3 +1,4 @@
+// Entry point for the application
 import 'package:ecomm_app/pages/cartpage.dart';
 import 'package:ecomm_app/pages/checkoutpage.dart';
 import 'package:ecomm_app/pages/homepage.dart';
@@ -6,16 +7,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 import './pages/login_page.dart';
 import 'package:provider/provider.dart';
 import './providers/cart_provider.dart';
+import '../providers/wishlist_provider.dart';
 
 void main() async {
+  // Ensure Flutter binding is initialized before running async code
   WidgetsFlutterBinding.ensureInitialized();
+  // Check for stored authentication token
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('authToken');
   final isLoggedIn = token != null && token.isNotEmpty;
+  // Run the application with providers for state management
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
       ],
       child: ECommApp(isLoggedIn: isLoggedIn),
     ),
@@ -48,6 +54,7 @@ class ECommApp extends StatelessWidget {
           backgroundColor: Color(0xFF91766E), // Brown bottom nav bar
         ),
       ),
+      // Navigate to the homepage if logged in, otherwise to the login page
       home: isLoggedIn ? const Homepage() : const LoginPage(),
       initialRoute: '/login',
       routes: {

@@ -2,6 +2,9 @@ import 'package:ecomm_app/providers/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+/// CheckoutPage
+/// A placeholder page that gets displayed when the user clicks on "Proceed to Checkout".
+/// Can be extended to include actual checkout functionality later.
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
 

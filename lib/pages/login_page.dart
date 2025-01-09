@@ -13,6 +13,7 @@ class _LoginPageState extends State<LoginPage> {
   // Text controllers to get user input
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _obscureText = true;
   final ApiService _apiService = ApiService();
 
   bool _isLoading = false;
@@ -55,13 +56,13 @@ class _LoginPageState extends State<LoginPage> {
                 content: const Text('You have been logged in successfully!'),
                 actions: [
                   TextButton(
-                      onPressed: () => {
-                            Navigator.pop(context),
-                            // Navigate to the homepage or show success
-                            Navigator.pushReplacementNamed(
-                                context, '/homepage'),
-                          },
-                      child: const Text('OK')),
+                    onPressed: () => {
+                      Navigator.pop(context),
+                      // Navigate to the homepage or show success
+                      Navigator.pushReplacementNamed(context, '/homepage'),
+                    },
+                    child: const Text('OK'),
+                  ),
                 ],
               ));
     } catch (error) {
@@ -95,12 +96,117 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login'),
-        centerTitle: true,
-        backgroundColor: Colors.brown.shade600,
-      ),
-      body: SingleChildScrollView(
+        body: Stack(
+      children: [
+        // background image
+        Positioned.fill(
+          child: Image.asset(
+            'assets/images/background.png', // Replace with your image path
+            fit: BoxFit.cover,
+          ),
+        ),
+        // Centered Card with login fields
+        Center(
+          child: Card(
+            color: Color(0xFFF6ECE3),
+            elevation: 10.0,
+            margin: const EdgeInsets.symmetric(horizontal: 24.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Welcome Back!',
+                    style: TextStyle(
+                      fontSize: 22.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.brown,
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      'Please enter your credentials',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  TextField(
+                    controller: _userNameController,
+                    decoration: InputDecoration(
+                        labelText: 'Username',
+                        prefixIcon: Icon(Icons.person),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        )),
+                  ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  TextField(
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                        labelText: 'Password',
+                        prefixIcon: Icon(Icons.lock),
+                        suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                            icon: Icon(
+                              _obscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            )),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        )),
+                    obscureText: _obscureText,
+                  ),
+                  const SizedBox(
+                    height: 16.0,
+                  ),
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.brown.shade600,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12.0, horizontal: 24.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            'Login',
+                            style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        )
+      ],
+    ));
+  }
+}
+
+/*SingleChildScrollView(
         // Allow scrolling if content overflows
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -183,7 +289,4 @@ class _LoginPageState extends State<LoginPage> {
             )
           ],
         ),
-      ),
-    );
-  }
-}
+      ),*/

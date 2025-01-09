@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 
+/// CartPage
+/// Displays a list of items added to the cart, with options to increase/decrease quantity or remove items.
+/// Also shows the total price and a button to proceed to checkout.
 class CartPage extends StatelessWidget {
   const CartPage({super.key});
 
@@ -22,8 +25,10 @@ class CartPage extends StatelessWidget {
           final cartItems = cartProvider.cartItems;
 
           return Column(
+            // Cart items list
             children: [
               Expanded(
+                // Cart items list
                 child: cartItems.isEmpty
                     ? const Center(
                         child: Text(
@@ -76,6 +81,7 @@ class CartPage extends StatelessWidget {
                         },
                       ),
               ),
+              // Total price and checkout button
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: const BoxDecoration(
