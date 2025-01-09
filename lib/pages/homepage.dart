@@ -2,7 +2,7 @@ import 'package:ecomm_app/providers/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../api_service.dart';
+import '../utils/api_service.dart';
 import 'product_detail_page.dart';
 import '../components/productcard.dart';
 import '../pages/wishlistpage.dart';
@@ -71,12 +71,10 @@ class _HomepageState extends State<Homepage> {
       _isLoading = true; // Set _isLoading to true before the api
     });
 
-    print("Fetching products... Page: $_page");
     // Update _allProducts and set the initial page of _products
     try {
       final List<dynamic> fetchedProducts =
           await _apiService.fetchAllProducts();
-      print("Total products fetched: ${fetchedProducts.length}");
       setState(() {
         _allProducts.addAll(fetchedProducts);
         if (_allProducts.isNotEmpty) {
@@ -111,7 +109,6 @@ class _HomepageState extends State<Homepage> {
       if (_products.length >= _allProducts.length && _allProducts.isNotEmpty) {
         // if products fetched finishes reuse the products again
         _products.addAll(_allProducts);
-        print("reusing");
       } else {
         // load paginated products
         final int startIndex = (_page - 1) * _limit;
@@ -125,7 +122,6 @@ class _HomepageState extends State<Homepage> {
           _page++; // increment page for the next fetch
         } else {
           _hasMoreProducts = false; //  No more products to load
-          print("No more products to load even after reuse ");
         }
       }
       _isLoading = false;
@@ -160,8 +156,6 @@ class _HomepageState extends State<Homepage> {
 
   // sorting logic
   void _applySorting(String? criteria) {
-    print("Sorting by: $criteria");
-
     if (criteria == "null") {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Invalid sorting criteria.")),
@@ -189,12 +183,10 @@ class _HomepageState extends State<Homepage> {
         _filteredProducts = sortedProducts;
       });
     } catch (error) {
-      print("Error while sorting: $error");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Error applying sorting.")),
       );
     }
-    print("Closing sorting method");
   }
 
   void _applyFilters() {
@@ -209,10 +201,6 @@ class _HomepageState extends State<Homepage> {
         return matchesCategory && withinPriceRanges && matchesRating;
       }).toList();
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Filters applied!")),
-    );
   }
 
   void _resetFilters() {

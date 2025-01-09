@@ -1,4 +1,4 @@
-import 'package:ecomm_app/api_service.dart';
+import '../utils/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -38,7 +38,6 @@ class _LoginPageState extends State<LoginPage> {
     try {
       // Call the login function from ApiService
       final token = await _apiService.loginUser(userName, password);
-      print("Login successful, token: $token");
       // Save the token to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', token);
@@ -205,88 +204,3 @@ class _LoginPageState extends State<LoginPage> {
     ));
   }
 }
-
-/*SingleChildScrollView(
-        // Allow scrolling if content overflows
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(25.0),
-              child: Image(
-                image: AssetImage('assets/images/loginimage.jpg'),
-              ),
-            ),
-            SizedBox(
-              height: 24.0,
-            ),
-            Text(
-              'Welcome Back!',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24.0,
-                color: Colors.black,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              'Please enter your login credentials.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14.0,
-                color: Colors.grey.shade600,
-              ),
-            ),
-            SizedBox(height: 16.0),
-            TextField(
-              controller: _userNameController,
-              decoration: InputDecoration(
-                labelText: 'Username',
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
-                      color: Colors.black,
-                      width: 10.0,
-                    )),
-                fillColor: Color(0xFFF6ECE3),
-              ),
-            ),
-            SizedBox(height: 16.0),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: BorderSide(
-                    color: Colors.grey.shade400,
-                    width: 2.0,
-                  ),
-                ),
-                fillColor: Color(0xFFF6ECE3),
-              ),
-              obscureText: true,
-            ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: _login,
-              // ignore: sort_child_properties_last
-              child: Text(
-                'Login',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shadowColor: Colors.grey.shade600,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  )),
-            )
-          ],
-        ),
-      ),*/

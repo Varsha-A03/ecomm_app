@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 /// ProductCard
 /// A reusable widget to display product details such as image, title, price, and wishlist toggle.

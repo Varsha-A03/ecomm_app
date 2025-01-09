@@ -207,9 +207,7 @@ class ProductDetailPage extends StatelessWidget {
                               image: product['image']),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content:
-                                  Text('Added to cart: ${product['title']}')),
+                          SnackBar(content: Text('Added to cart!')),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -237,7 +235,8 @@ class ProductDetailPage extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.brown.shade600,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0)),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
                         padding: EdgeInsets.symmetric(vertical: 10.0),
                       ),
                       child: const Text(
