@@ -154,8 +154,8 @@ class _CheckoutpageState extends State<CheckoutPage> {
                                   // clear cart and navigate back to home
                                   cartProvider.cartItems.clear();
                                   cartProvider.notifyListeners();
-                                  Navigator.popUntil(
-                                      context, ModalRoute.withName('/'));
+                                  Navigator.popUntil(context,
+                                      ModalRoute.withName('/homepage'));
                                 },
                                 child: const Text("OK"),
                               ),

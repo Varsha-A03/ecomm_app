@@ -1,4 +1,5 @@
 import 'package:ecomm_app/providers/cart_provider.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -154,27 +155,29 @@ class _HomepageState extends State<Homepage> {
     });
   }
 
-  // sorting logic
   void _applySorting(String? criteria) {
-    if (criteria == "null") {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Invalid sorting criteria.")),
-      );
-      return;
-    }
     setState(() {
-      _selectedSortCriteria = '$criteria';
+      _selectedSortCriteria = criteria ?? "None";
+
+      // Apply sorting to the filtered products
+      _applySortingToFilteredProducts();
     });
-    List<dynamic> sortedProducts = [..._products];
+  }
+
+  // sorting logic
+  void _applySortingToFilteredProducts() {
+    List<dynamic> sortedProducts =
+        _filteredProducts.isEmpty ? List.from(_products) : _filteredProducts;
     try {
-      if ('$criteria' == "Price (Low to High)") {
+      if (_selectedSortCriteria == "Price (Low to High)" ||
+          _selectedSortCriteria == "None") {
         sortedProducts.sort((a, b) => a['price'].compareTo(b['price']));
-      } else if ('$criteria' == "Price (High to Low)") {
+      } else if (_selectedSortCriteria == "Price (High to Low)") {
         sortedProducts.sort((a, b) => b['price'].compareTo(a['price']));
-      } else if ('$criteria' == "Most Reviewed") {
+      } else if (_selectedSortCriteria == "Most Reviewed") {
         sortedProducts.sort(
             (a, b) => b['rating']['count'].compareTo(a['rating']['count']));
-      } else if ('$criteria' == "Highest Rated") {
+      } else if (_selectedSortCriteria == "Highest Rated") {
         sortedProducts
             .sort((a, b) => b['rating']['rate'].compareTo(a['rating']['rate']));
       }
@@ -200,6 +203,7 @@ class _HomepageState extends State<Homepage> {
 
         return matchesCategory && withinPriceRanges && matchesRating;
       }).toList();
+      // After filtering, apply sorting to the filtered list
     });
   }
 
@@ -336,209 +340,232 @@ class _HomepageState extends State<Homepage> {
     final wishlistProvider = Provider.of<WishlistProvider>(context);
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 4.0,
-          backgroundColor: Colors.brown.shade600,
-          iconTheme: IconThemeData(color: Colors.white),
-          actions: [
-            IconButton(
-              onPressed: () {
-                // navigate to cart page
-                Navigator.pushNamed(context, '/cartpage');
-              },
-              icon: const Icon(Icons.shopping_cart),
-            ),
-            PopupMenuButton<String?>(
-              onSelected: _applySorting,
-              itemBuilder: (context) => [
-                const PopupMenuItem(value: "None", child: Text('None')),
-                const PopupMenuItem(
-                    value: 'Price (Low to High)',
-                    child: Text('Sort by Price(Low to High)')),
-                const PopupMenuItem(
-                    value: 'Price (High to Low)',
-                    child: Text('Sort by Price(High to Low)')),
-                const PopupMenuItem(
-                    value: 'Most Reviewed', child: Text('Most Reviewed')),
-                const PopupMenuItem(
-                    value: 'Highest Rated', child: Text('Highest Rated')),
-              ],
-            ),
-          ],
-        ),
-        drawer: Drawer(
-          backgroundColor: Color(0xFFF6ECE3),
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: BoxDecoration(color: Colors.brown.shade600),
-                child:
-                    const Text('Menu', style: TextStyle(color: Colors.white)),
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          appBar: AppBar(
+            elevation: 4.0,
+            backgroundColor: Colors.brown.shade600,
+            iconTheme: IconThemeData(color: Colors.white),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  // navigate to cart page
+                  Navigator.pushNamed(context, '/cartpage');
+                },
+                icon: const Icon(Icons.shopping_cart),
               ),
-              ListTile(
-                  leading: const Icon(Icons.favorite),
+              PopupMenuButton<String?>(
+                onSelected: _applySorting,
+                itemBuilder: (context) => [
+                  const PopupMenuItem(value: "None", child: Text('None')),
+                  const PopupMenuItem(
+                      value: 'Price (Low to High)',
+                      child: Text('Sort by Price(Low to High)')),
+                  const PopupMenuItem(
+                      value: 'Price (High to Low)',
+                      child: Text('Sort by Price(High to Low)')),
+                  const PopupMenuItem(
+                      value: 'Most Reviewed', child: Text('Most Reviewed')),
+                  const PopupMenuItem(
+                      value: 'Highest Rated', child: Text('Highest Rated')),
+                ],
+              ),
+            ],
+          ),
+          drawer: Drawer(
+            backgroundColor: Color(0xFFF6ECE3),
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                DrawerHeader(
+                  decoration: BoxDecoration(color: Colors.brown.shade600),
+                  child:
+                      const Text('Menu', style: TextStyle(color: Colors.white)),
+                ),
+                ListTile(
+                    leading: const Icon(Icons.favorite),
+                    title: const Text(
+                      'Wishlist',
+                      style: TextStyle(
+                          fontSize: 20.0, fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => WishlistPage(
+                                  wishlist: wishlistProvider.wishlistItems)));
+                    }),
+                ListTile(
+                  leading: const Icon(Icons.arrow_back),
                   title: const Text(
-                    'Wishlist',
+                    'Back',
                     style:
                         TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                   ),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => WishlistPage(
-                                wishlist: wishlistProvider.wishlistItems)));
-                  }),
-              ListTile(
-                leading: const Icon(Icons.arrow_back),
-                title: const Text(
-                  'Back',
-                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  onTap: () => Navigator.pop(context),
                 ),
-                onTap: () => Navigator.pop(context),
-              ),
-              ListTile(
-                leading: const Icon(Icons.logout),
-                title: const Text(
-                  'Logout',
-                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                ),
-                onTap: () async {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.remove('authToken');
-                  Navigator.pushReplacementNamed(context, '/login');
-                },
-              )
-            ],
+                ListTile(
+                  leading: const Icon(Icons.logout),
+                  title: const Text(
+                    'Logout',
+                    style:
+                        TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+                  ),
+                  onTap: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.remove('authToken');
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                )
+              ],
+            ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _showFilterOptions,
-          child: const Icon(Icons.filter_alt),
-        ),
-        body: Column(children: [
-          // Search bar
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              onChanged: _searchProducts,
-              decoration: InputDecoration(
-                labelText: 'Search',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+          floatingActionButton: FloatingActionButton(
+            onPressed: _showFilterOptions,
+            child: const Icon(Icons.filter_alt),
+          ),
+          body: Column(children: [
+            // Search bar
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: 56.0),
+                child: GestureDetector(
+                  onTap: () {
+                    FocusScope.of(context)
+                        .unfocus(); // Dismiss any active input focus
+                  },
+                  child: TextField(
+                    onChanged: _searchProducts,
+                    mouseCursor: SystemMouseCursors.text,
+                    decoration: InputDecoration(
+                      labelText: 'Search',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-          // Category filter
-          Container(
-            height: 50.0,
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: Row(
-                children: _categories.map((category) {
-                  final isSelected = category == _selectedCategory;
-                  return GestureDetector(
-                    onTap: () => _filterByCategory(category),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 8.0),
-                      margin: const EdgeInsets.only(right: 8.0),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? Colors.brown.shade600
-                            : Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      child: Center(
-                        child: Text(
-                          category[0].toUpperCase() + category.substring(1),
-                          style: TextStyle(
-                            fontSize: 15.0,
-                            color: isSelected ? Colors.white : Colors.black,
+            // Category nav bar
+            Container(
+              height: 50.0,
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: ScrollConfiguration(
+                behavior: ScrollBehavior().copyWith(
+                  scrollbars: false,
+                  dragDevices: {
+                    PointerDeviceKind.mouse,
+                    PointerDeviceKind.touch,
+                  },
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: _categories.map((category) {
+                      final isSelected = category == _selectedCategory;
+                      return GestureDetector(
+                        onTap: () => _filterByCategory(category),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 8.0),
+                          margin: const EdgeInsets.only(right: 8.0),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Colors.brown.shade600
+                                : Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: Center(
+                            child: Text(
+                              category[0].toUpperCase() + category.substring(1),
+                              style: TextStyle(
+                                fontSize: 15.0,
+                                color: isSelected ? Colors.white : Colors.black,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  );
-                }).toList(),
+                      );
+                    }).toList(),
+                  ),
+                ),
               ),
             ),
-          ),
-          // Product grid
-          Expanded(
-            child: _products.isEmpty
-                ? Center(
-                    child: Text(
-                      'No products found. Wait Till the products load or try adjusting your filters.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 16.0,
-                      ),
-                    ),
-                  )
-                : GridView.builder(
-                    padding: const EdgeInsets.all(8.0),
-                    controller: _scrollController,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: isDesktop
-                            ? 4
-                            : isTablet
-                                ? 3
-                                : 2, // Adaptive column count,
-                        mainAxisSpacing: 2.0, // spacing between rows
-                        crossAxisSpacing: 2.0 // spacing between products
+            // Product grid
+            Expanded(
+              child: _products.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No products found. Wait Till the products load or try adjusting your filters.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16.0,
                         ),
-                    itemCount: (_filteredProducts.isNotEmpty
-                            ? _filteredProducts.length
-                            : _products.length) +
-                        (_hasMoreProducts ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index >=
-                          (_filteredProducts.isNotEmpty
+                      ),
+                    )
+                  : GridView.builder(
+                      padding: const EdgeInsets.all(8.0),
+                      controller: _scrollController,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: isDesktop
+                              ? 4
+                              : isTablet
+                                  ? 3
+                                  : 2, // Adaptive column count,
+                          mainAxisSpacing:
+                              isDesktop ? 16.0 : 2.0, // spacing between rows
+                          crossAxisSpacing:
+                              isDesktop ? 16.0 : 2.0 // spacing between products
+                          ),
+                      itemCount: (_filteredProducts.isNotEmpty
                               ? _filteredProducts.length
-                              : _products.length)) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-
-                      final product = _filteredProducts.isNotEmpty
-                          ? _filteredProducts[index]
-                          : _products[index];
-                      final isWishlisted =
-                          wishlistProvider.isWishlisted(product);
-                      return Productcard(
-                        product: product,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  ProductDetailPage(product: product),
-                            ),
+                              : _products.length) +
+                          (_hasMoreProducts ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index >=
+                            (_filteredProducts.isNotEmpty
+                                ? _filteredProducts.length
+                                : _products.length)) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
                           );
-                        },
-                        onWishlistToggle: () => _toggleWishlist(product),
-                        isWishlisted: isWishlisted,
-                      );
-                    },
-                  ),
-          ),
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: CircularProgressIndicator(),
+                        }
+
+                        final product = _filteredProducts.isNotEmpty
+                            ? _filteredProducts[index]
+                            : _products[index];
+                        final isWishlisted =
+                            wishlistProvider.isWishlisted(product);
+                        return Productcard(
+                          product: product,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ProductDetailPage(product: product),
+                              ),
+                            );
+                          },
+                          onWishlistToggle: () => _toggleWishlist(product),
+                          isWishlisted: isWishlisted,
+                        );
+                      },
+                    ),
             ),
-        ]),
-      ),
-    );
+            if (_isLoading)
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircularProgressIndicator(),
+              ),
+          ]),
+        ));
   }
 }

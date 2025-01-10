@@ -19,93 +19,115 @@ class Productcard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final isDesktop = screenWidth > 1024;
     return GestureDetector(
       onTap: onTap, // Navigate to product detail page
       child: Card(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          // for the image and title , price to be in a column
+        elevation: 2.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Stack(
           children: [
-            // Product image
-            ClipRRect(
-                // for rounded contaner
-                borderRadius: BorderRadius.circular(10.0),
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10.0),
-                  child: Image.network(
-                    product['image'],
-                    height: 80.0,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, StackTrace) =>
-                        Icon(Icons.error),
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      );
-                    },
-                  ),
-                )),
-            // Product title
-            Padding(
-              padding: const EdgeInsets.only(top: 4.0, left: 8.0),
-              child: Column(
-                // for title and price
-                crossAxisAlignment: CrossAxisAlignment.start, // align.left
-                children: [
-                  Text(
-                    product['title'],
-                    style: const TextStyle(
-                      fontFamily: 'rubik',
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    maxLines: 2, // Limit title to two lines
-                  ),
-                  // Product price
-                  Text(
-                    '\$${product['price'].toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      color: Colors.green,
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.bold,
+            // Main content of the card
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Product image
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10.0),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Image.network(
+                      product['image'],
+                      height:
+                          isDesktop ? screenWidth * 0.15 : screenWidth * 0.20,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.error),
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      },
                     ),
                   ),
-                  Row(
+                ),
+                // Product title, price, and rating
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 4.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.star,
-                        color: Colors.yellow.shade600,
-                        size: 14.0,
-                      ),
+                      // Product title
                       Text(
-                        '${product['rating']['rate']} (${product['rating']['count']} reviews)',
+                        product['title'],
                         style: TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey,
+                          fontFamily: 'rubik',
+                          fontSize: isDesktop ? 18.0 : 16.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      // Wishlist button
-                      IconButton(
-                          onPressed: onWishlistToggle,
-                          icon: Icon(
-                            isWishlisted
-                                ? Icons.favorite
-                                : Icons.favorite_border_outlined,
-                            color: isWishlisted ? Colors.red : Colors.grey,
-                          )),
+                      // Product price
+                      Text(
+                        '\$${product['price'].toStringAsFixed(2)}',
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontSize: isDesktop ? 16.0 : 14.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      // Product rating
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.star,
+                            color: Colors.yellow.shade600,
+                            size: 14.0,
+                          ),
+                          const SizedBox(width: 4.0),
+                          Text(
+                            '${product['rating']['rate']}',
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(width: 4.0),
+                          Text(
+                            '(${product['rating']['count']} reviews)',
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
+                ),
+              ],
+            ),
+
+            // Wishlist button at the top-right corner
+            Positioned(
+              top: 3.0,
+              right: 3.0,
+              child: IconButton(
+                onPressed: onWishlistToggle,
+                icon: Icon(
+                  isWishlisted
+                      ? Icons.favorite
+                      : Icons.favorite_border_outlined,
+                  color: isWishlisted ? Colors.red : Colors.grey,
+                ),
               ),
-            )
+            ),
           ],
         ),
       ),

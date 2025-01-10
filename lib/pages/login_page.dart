@@ -68,7 +68,6 @@ class _LoginPageState extends State<LoginPage> {
       setState(() {
         _errorMessage = error.toString();
       });
-      print(_errorMessage);
       showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -141,6 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   TextField(
                     controller: _userNameController,
+                    focusNode: FocusNode(), // Ensure focus can be controlled
                     decoration: InputDecoration(
                         labelText: 'Username',
                         prefixIcon: Icon(Icons.person),
@@ -153,6 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   TextField(
                     controller: _passwordController,
+                    focusNode: FocusNode(), // Ensure focus can be controlled
                     decoration: InputDecoration(
                         labelText: 'Password',
                         prefixIcon: Icon(Icons.lock),

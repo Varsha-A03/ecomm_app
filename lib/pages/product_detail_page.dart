@@ -37,7 +37,13 @@ class ProductDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double rating = product['rating']['rate'];
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final isDesktop = screenWidth > 1024;
+
+    final double rating = product['rating']['rate'] is int
+        ? product['rating']['rate'].toDouble()
+        : product['rating']['rate'];
     final int reviewCount = product['rating']['count'];
     final List<String> reviews = _generateReviews(rating, reviewCount);
     return Scaffold(
@@ -62,7 +68,7 @@ class ProductDetailPage extends StatelessWidget {
                 Center(
                   child: Image.network(
                     product['image'],
-                    height: 250.0,
+                    height: isDesktop ? screenWidth * 0.25 : screenWidth * 0.75,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, StackTrace) =>
                         Icon(Icons.error),
@@ -83,8 +89,8 @@ class ProductDetailPage extends StatelessWidget {
                 // Product title
                 Text(
                   product['title'],
-                  style: const TextStyle(
-                    fontSize: 20.0,
+                  style: TextStyle(
+                    fontSize: isDesktop ? 24.0 : 18.0,
                     fontWeight: FontWeight.bold,
                     color: Colors.brown,
                   ),
@@ -93,8 +99,8 @@ class ProductDetailPage extends StatelessWidget {
                 // Product price
                 Text(
                   '\$${product['price'].toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 20.0,
+                  style: TextStyle(
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -103,26 +109,26 @@ class ProductDetailPage extends StatelessWidget {
                 // Product description
                 Text(
                   product['description'],
-                  style: const TextStyle(
-                    fontSize: 16.0,
+                  style: TextStyle(
+                    fontSize: isDesktop ? 18.0 : 15.0,
                     color: Colors.black54,
                   ),
                 ),
-                const SizedBox(height: 3.0),
+                const SizedBox(height: 10.0),
                 // Product rating
                 Row(
                   children: [
                     Icon(
                       Icons.star,
                       color: Colors.yellow.shade600,
-                      size: 15.0,
+                      size: 16.0,
                     ),
                     Text(
                       '${product['rating']['rate']} (${product['rating']['count']} reviews)',
                       style: TextStyle(
-                        fontSize: 15.0,
+                        fontSize: 16.0,
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade800,
+                        color: Colors.green,
                       ),
                     ),
                   ],
@@ -225,7 +231,9 @@ class ProductDetailPage extends StatelessWidget {
                       ),
                     ),
                   ),
-
+                  const SizedBox(
+                    width: 10.0,
+                  ),
                   // view cart button
                   Expanded(
                     child: ElevatedButton(

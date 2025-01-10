@@ -9,6 +9,9 @@ class WishlistPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600 && screenWidth <= 1024;
+    final isDesktop = screenWidth > 1024;
     return Scaffold(
         appBar: AppBar(
           title: Text('Wishlist',
@@ -28,8 +31,12 @@ class WishlistPage extends StatelessWidget {
               )
             : GridView.builder(
                 padding: EdgeInsets.all(8.0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: isDesktop
+                      ? 6
+                      : isTablet
+                          ? 3
+                          : 2,
                   mainAxisSpacing: 2.0,
                   crossAxisSpacing: 2.0,
                 ),

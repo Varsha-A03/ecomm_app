@@ -2,12 +2,15 @@
 import 'package:ecomm_app/pages/cartpage.dart';
 import 'package:ecomm_app/pages/checkoutpage.dart';
 import 'package:ecomm_app/pages/homepage.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import './pages/login_page.dart';
 import 'package:provider/provider.dart';
 import './providers/cart_provider.dart';
 import '../providers/wishlist_provider.dart';
+import '../utils/customScroll';
+import 'package:flutter/foundation.dart';
 
 void main() async {
   // Ensure Flutter binding is initialized before running async code
@@ -16,6 +19,10 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('authToken');
   final isLoggedIn = token != null && token.isNotEmpty;
+  if (kIsWeb) {
+    GestureBinding.instance.pointerRouter
+        .addGlobalRoute((PointerEvent event) {});
+  }
   // Run the application with providers for state management
   runApp(
     MultiProvider(
@@ -37,6 +44,7 @@ class ECommApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      scrollBehavior: CustomScrollBehavior(),
       title: 'E-commerce App',
       theme: ThemeData(
         primaryColor: Color(0xFF000000), // Black
